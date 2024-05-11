@@ -36,7 +36,7 @@ class SteamDB:
     def read_dataset(self):
         self.df = pd.read_csv(self.path)
         # get only 100 rows
-        self.df = self.df.head(100)
+        # self.df = self.df.head(100)
 
     def read_files_to_chroma(self, chroma_persist_directory):
         """
@@ -49,13 +49,13 @@ class SteamDB:
         logger.debug(f"Dir of self.vectordb {type(self.vectordb)}:  {dir(self.vectordb)}")
         # loop over the docs and add them to the db
         for doc in tqdm(docs):
-            self.vectordb.add_documents([doc])
+            game_name = doc.metadata["Name"]
+            self.vectordb.add_documents([doc], ids=[game_name])
 
     def initialize_db(self, chroma_persist_directory):
         """
         Initialize the db
         """
-
         self.vectordb = Chroma(
             persist_directory=chroma_persist_directory,
             embedding_function=self.embeddings,
@@ -65,6 +65,13 @@ class SteamDB:
 
 
     def format_dataset(self):
+        # delete rows where game name is already in the chromadb
+        logger.debug(f"Vector db get {self.vectordb.get().keys()}")
+        ids = self.vectordb.get()['ids']
+        logger.debug(f"IDs in vector db {ids}")
+        self.df = self.df[~self.df['Name'].isin(ids)]
+        # drop nan values where name or about the game is nan
+        self.df = self.df.dropna(subset=['Name', 'About the game'])
         self.df['text'] = self.df['Name'] + ' ' + self.df['About the game']
 
     def get_list_docs(self):
