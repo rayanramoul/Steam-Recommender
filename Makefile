@@ -1,5 +1,6 @@
 # Variables
-APP_FILE = app.py
+APP_FILE = src/api.py
+FRONT_FILE = src-front/app.py
 VENV_NAME = .venv
 
 # Install dependencies
@@ -8,5 +9,8 @@ install:
 	poetry install
 
 # Run the Streamlit app
-run:
-	poetry run streamlit run $(APP_FILE)
+run-back:
+	poetry run fastapi run $(APP_FILE)
+
+run-front:
+	poetry run flet run $(FRONT_FILE) --web -p 9000

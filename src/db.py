@@ -105,7 +105,7 @@ class SteamDB:
 
     def search_similar(self, query:str, n:int = 5):
         logger.debug(f"Searching for query: {query}")
-        docs = self.retriever.get_relevant_documents(query)
+        docs = self.retriever.get_relevant_documents(query, n=n)
         logger.debug(f"Found {len(docs)} relevant documents")
         games = []
         for i in range(min(n, len(docs))):
