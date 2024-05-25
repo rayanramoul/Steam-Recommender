@@ -17,6 +17,8 @@ sentence-transformers = "^2.7.0"
 tqdm = "^4.66.4"
 fastapi = "^0.111.0"
 flet = "^0.22.1"
+schedule = "^1.2.1"
+tenacity = "^8.3.0"
 
 
 [build-system]
