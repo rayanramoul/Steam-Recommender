@@ -45,18 +45,23 @@ def fetch_steam_games(output_path="steam_games.csv"):
         while not details_response:
             try:
                 details_response = requests.get(app_details_url)
-            except ConnectionError:
-                logger.info("Connection error. Retrying...")
+            except:
+                logger.info("Connection error Retrying...")
                 time.sleep(5)
 
         if details_response.status_code == 200:
-            details = details_response.json().get(str(app_id), {}).get("data", {})
+            try:
+                details = details_response.json().get(str(app_id), {}).get("data", {})
+            except requests.exceptions.RequestException as e:
+                logger.error(f"Failed to fetch details for game: {app.get('name')}, app_id: {app_id}")
+                logger.error(f"Error: {e}")
+                details = {}
             logger.info(f"Details: {details.keys()}, for game app_id: {app_id}")
             if details:
                 logger.info(f"Fetching details for game: {details.get('name')}")
                 logger.info(f"Details: {details.keys()}")
                 game_info = {
-                    "Name": details.get("name"),
+                    "Name": details.get("name", ""),
                     "About the game": details.get("short_description", ""),
                     "Detailed Descriptions": details.get("detailed_description", ""),
                     "App ID": app_id,
