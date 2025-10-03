@@ -1,0 +1,35 @@
+FROM nvidia/cuda:12.2.0-runtime-ubuntu22.04 AS base
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    UV_NO_TELEMETRY=1
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 python3-venv python3-pip curl ca-certificates build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Install uv by copying pinned binary
+COPY --from=ghcr.io/astral-sh/uv:0.8.22 /uv /uvx /bin/
+
+# Copy project metadata and pre-sync deps
+COPY pyproject.toml README.md ./
+
+# Force torch CUDA build
+ENV UV_TOOL_BIN_DIR=/opt/uv-bin/
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --no-install-project
+
+ADD . /app
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync
+
+EXPOSE 8000
+
+CMD ["uv", "run", "uvicorn", "src.api:app", "--host", "0.0.0.0", "--port", "8000"]
+
+

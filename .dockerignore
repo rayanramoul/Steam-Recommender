@@ -1,0 +1,15 @@
+.git
+.gitignore
+__pycache__
+.venv
+*.pyc
+*.pyo
+*.pyd
+*.log
+dist
+build
+*.egg-info
+node_modules
+data/chroma
+data
+

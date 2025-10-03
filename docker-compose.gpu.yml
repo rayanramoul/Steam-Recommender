@@ -1,0 +1,9 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.gpu
+    gpus: all
+    environment:
+      - CUDA_VISIBLE_DEVICES=all
+

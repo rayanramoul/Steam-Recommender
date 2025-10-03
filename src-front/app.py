@@ -2,6 +2,7 @@ import flet as ft
 import requests
 from loguru import logger
 import pandas as pd
+import os
 
 def headers(df : pd.DataFrame) -> list:
     return [ft.DataColumn(ft.Text(header)) for header in df.columns]
@@ -23,7 +24,8 @@ def main(page):
 
     def search_games(e):
         global results
-        url = "http://localhost:8000/search"
+        api_url = os.environ.get("API_URL", "http://localhost:8000")
+        url = f"{api_url}/search"
         params = {"query": query.value, "num_results": num_results.value}
         logger.debug(f"Query: {params}")
         response = requests.get(url, params=params)
